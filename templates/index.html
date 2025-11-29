@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Black-Scholes Option Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Black-Scholes 옵션 계산기</h1>
+        <p>로그정규 분포를 따르는 기초자산을 가정하고, 사용자가 정의한 페이오프 식에 대해 몬테카를로 방식으로 가격을 추정합니다.</p>
+      </header>
+
+      <section class="card">
+        <form method="post">
+          <div class="grid">
+            <label>
+              Spot price (S₀)
+              <input type="number" name="spot_price" step="0.01" value="{{ defaults.spot_price }}" required />
+            </label>
+            <label>
+              Strike (K)
+              <input type="number" name="strike_price" step="0.01" value="{{ defaults.strike_price }}" required />
+            </label>
+            <label>
+              Risk-free rate (r)
+              <input type="number" name="risk_free_rate" step="0.0001" value="{{ defaults.risk_free_rate }}" required />
+            </label>
+            <label>
+              Volatility (σ)
+              <input type="number" name="volatility" step="0.0001" value="{{ defaults.volatility }}" required />
+            </label>
+            <label>
+              Maturity (T, years)
+              <input type="number" name="maturity" step="0.01" value="{{ defaults.maturity }}" required />
+            </label>
+            <label>
+              Simulations
+              <input type="number" name="simulations" step="1000" value="{{ defaults.simulations }}" required />
+            </label>
+          </div>
+          <label class="full-width">
+            Payoff expression (사용 가능 변수: <code>S_T</code>, <code>K</code>, <code>S0</code>, <code>r</code>)
+            <input
+              type="text"
+              name="payoff_expression"
+              value="{{ defaults.payoff_expression }}"
+              required
+            />
+            <small>사용 가능 함수: maximum, minimum, max, min, abs, exp, log, sqrt, clip</small>
+          </label>
+          <button type="submit">가격 계산하기</button>
+        </form>
+      </section>
+
+      {% if result %}
+      <section class="card result">
+        <h2>결과</h2>
+        <p class="price">가격: {{ '%.4f' | format(result.price) }}</p>
+        <dl>
+          <div><dt>Spot price</dt><dd>{{ result.inputs.spot_price }}</dd></div>
+          <div><dt>Strike</dt><dd>{{ result.inputs.strike_price }}</dd></div>
+          <div><dt>Risk-free rate</dt><dd>{{ result.inputs.risk_free_rate }}</dd></div>
+          <div><dt>Volatility</dt><dd>{{ result.inputs.volatility }}</dd></div>
+          <div><dt>Maturity</dt><dd>{{ result.inputs.maturity }}</dd></div>
+          <div><dt>Simulations</dt><dd>{{ result.inputs.simulations }}</dd></div>
+          <div><dt>Payoff</dt><dd><code>{{ result.inputs.payoff_expression }}</code></dd></div>
+        </dl>
+      </section>
+      {% endif %}
+
+      {% if errors %}
+      <section class="card error">
+        <h2>에러</h2>
+        <p>{{ errors }}</p>
+      </section>
+      {% endif %}
+    </main>
+  </body>
+</html>
